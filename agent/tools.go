@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/Autumn-27/artex/db"
-	acperm "github.com/Autumn-27/norma/permission"
-	actool "github.com/Autumn-27/norma/tool"
+	acperm "github.com/UnifyNook/Norma/permission"
+	actool "github.com/UnifyNook/Norma/tool"
 )
 
 // compactIntents distills intents to {id, summary, state, asset_ids, parents,

@@ -26,9 +26,9 @@ import (
 	"github.com/Autumn-27/artex/llmrec"
 	"github.com/Autumn-27/artex/report"
 	"github.com/Autumn-27/artex/traffic"
-	"github.com/Autumn-27/norma/llm"
-	actool "github.com/Autumn-27/norma/tool"
-	"github.com/Autumn-27/norma/transcript"
+	"github.com/UnifyNook/Norma/llm"
+	actool "github.com/UnifyNook/Norma/tool"
+	"github.com/UnifyNook/Norma/transcript"
 )
 
 // BuildVersion is the backend application version, injected from cmd/artex at

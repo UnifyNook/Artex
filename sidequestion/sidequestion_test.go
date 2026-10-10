@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/Autumn-27/artex/llmpool"
-	"github.com/Autumn-27/norma/harness"
-	"github.com/Autumn-27/norma/llm"
+	"github.com/UnifyNook/Norma/harness"
+	"github.com/UnifyNook/Norma/llm"
 )
 
 type fakeProvider struct {

@@ -11,8 +11,8 @@ import (
 
 	"github.com/Autumn-27/artex/agent"
 	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/norma/permission"
-	actool "github.com/Autumn-27/norma/tool"
+	"github.com/UnifyNook/Norma/permission"
+	actool "github.com/UnifyNook/Norma/tool"
 )
 
 // jsonResult marshals v to a JSON tool result.

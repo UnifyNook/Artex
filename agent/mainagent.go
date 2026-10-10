@@ -6,11 +6,11 @@ import (
 
 	"github.com/Autumn-27/artex/db"
 	"github.com/Autumn-27/artex/intercept"
-	"github.com/Autumn-27/norma/agentcore"
-	"github.com/Autumn-27/norma/llm"
-	"github.com/Autumn-27/norma/permission"
-	actool "github.com/Autumn-27/norma/tool"
-	"github.com/Autumn-27/norma/transcript"
+	"github.com/UnifyNook/Norma/agentcore"
+	"github.com/UnifyNook/Norma/llm"
+	"github.com/UnifyNook/Norma/permission"
+	actool "github.com/UnifyNook/Norma/tool"
+	"github.com/UnifyNook/Norma/transcript"
 )
 
 // MainAgent is the thin human-interface orchestrator (docs §4.2 / §7). The human

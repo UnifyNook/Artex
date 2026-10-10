@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/norma/llm"
-	"github.com/Autumn-27/norma/transcript"
+	"github.com/UnifyNook/Norma/llm"
+	"github.com/UnifyNook/Norma/transcript"
 )
 
 type taskIDContextKey struct{}

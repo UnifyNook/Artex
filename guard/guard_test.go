@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/Autumn-27/norma/hook"
+	"github.com/UnifyNook/Norma/hook"
 )
 
 // A guard with no interceptor no longer hard-blocks anything: destructive/exfil

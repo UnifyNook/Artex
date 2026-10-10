@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/norma/agentcore"
-	"github.com/Autumn-27/norma/llm"
+	"github.com/UnifyNook/Norma/agentcore"
+	"github.com/UnifyNook/Norma/llm"
 )
 
 type captureUsageProvider struct {
