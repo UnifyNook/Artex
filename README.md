@@ -70,7 +70,7 @@ AI 自主渗透测试系统（Go 后端 + Next.js 前端）
 
 ```bash
 git clone https://github.com/UnifyNook/Artex.git
-cd ARTEX
+cd Artex
 ./install.sh
 ```
 
@@ -85,9 +85,9 @@ cd ARTEX
 
 ```bash
 git clone https://github.com/UnifyNook/Artex.git
-cd ARTEX
+cd Artex
 cp .env.example .env          # 填 POSTGRES_PASSWORD、可选 ANTHROPIC_API_KEY
-docker compose up -d          # 拉取 autumn27/artex 镜像 + postgres
+docker compose up -d          # 拉取 ghcr.io/unifynook/artex 镜像 + postgres
 # → http://localhost:8787
 ```
 
@@ -160,7 +160,7 @@ ARTEX_TARGETS=linux/amd64,windows/amd64 ./build.sh --release
 ### 方式二：一键更新脚本
 
 ```bash
-cd ARTEX
+cd Artex
 ./update.sh
 ```
 
@@ -172,7 +172,7 @@ cd ARTEX
 ### 方式三：Docker Compose（手动）
 
 ```bash
-cd ARTEX
+cd Artex
 git pull                       # 更新 compose / 脚本（可选）
 # 指定版本：在 .env 设 ARTEX_TAG=v0.2.0；不设则用 latest
 docker compose pull artex
