@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/intercept"
+	"github.com/UnifyNook/Artex/db"
+	"github.com/UnifyNook/Artex/intercept"
 	"github.com/UnifyNook/Norma/llm"
 )
 

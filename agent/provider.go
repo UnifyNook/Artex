@@ -20,7 +20,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Autumn-27/artex/llmrec"
+	"github.com/UnifyNook/Artex/llmrec"
 	"github.com/UnifyNook/Norma/agentcore"
 	"github.com/UnifyNook/Norma/compaction"
 	"github.com/UnifyNook/Norma/llm"

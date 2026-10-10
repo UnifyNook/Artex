@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/guard"
-	"github.com/Autumn-27/artex/intercept"
+	"github.com/UnifyNook/Artex/db"
+	"github.com/UnifyNook/Artex/guard"
+	"github.com/UnifyNook/Artex/intercept"
 	"github.com/UnifyNook/Norma/agentcore"
 	"github.com/UnifyNook/Norma/llm"
 	"github.com/UnifyNook/Norma/permission"

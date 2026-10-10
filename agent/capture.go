@@ -6,9 +6,9 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/Autumn-27/artex/db"
-	"github.com/Autumn-27/artex/intercept"
-	"github.com/Autumn-27/artex/sidequestion"
+	"github.com/UnifyNook/Artex/db"
+	"github.com/UnifyNook/Artex/intercept"
+	"github.com/UnifyNook/Artex/sidequestion"
 	"github.com/UnifyNook/Norma/agentcore"
 	"github.com/UnifyNook/Norma/harness"
 	"github.com/UnifyNook/Norma/llm"

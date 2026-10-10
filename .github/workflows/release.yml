@@ -49,6 +49,24 @@ jobs:
         with:
           name: web-dist
           path: server/webui/dist
+      # Norma 是私有仓库，go 拉取需跳过公共 proxy/sumdb（GOPRIVATE）并注入 GitHub App 安装令牌。
+      # 前置条件：UnifyNook 的 GitHub App 已安装到 Norma 仓库（Repository permissions 含
+      # Contents: Read-only）。vars.APP_CLIENT_ID / secrets.APP_PRIVATE_KEY 建议配在组织级，
+      # 供飞书通知等其他工作流复用；此处把令牌再收窄到只读 Norma，最小权限。
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: UnifyNook
+          repositories: Norma
+          permission-contents: read
+      - name: Authenticate private Go modules
+        env:
+          APP_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          git config --global url."https://x-access-token:${APP_TOKEN}@github.com/UnifyNook/".insteadOf "https://github.com/UnifyNook/"
+          echo "GOPRIVATE=github.com/UnifyNook/*" >> "$GITHUB_ENV"
       - name: Build and package with build.sh
         env:
           ARTEX_TARGET_OS: ${{ matrix.goos }}

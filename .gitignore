@@ -9,6 +9,10 @@ __pycache__/
 *.pyc
 *.pyo
 
+# 本地开发工作区（指向 ../norma 的路径依赖，仅供本机，不提交）
+go.work
+go.work.sum
+
 # frontend
 web/node_modules/
 web/.next/
