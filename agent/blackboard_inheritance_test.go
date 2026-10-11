@@ -82,26 +82,17 @@ func TestGraphOverviewExpandsAssociatedCompanyScope(t *testing.T) {
 	if !ok {
 		t.Fatalf("coverage missing: %#v", overview["coverage"])
 	}
-	scopeRows, ok := coverage["scope"].([]map[string]any)
-	if !ok || len(scopeRows) != 1 {
-		t.Fatalf("task scope missing: %#v", coverage["scope"])
+	// graph_overview 只携带覆盖度计数（06a43f3 起不再平铺 scope 行），公司关联经由
+	// task_scope 的 kind=company 行参与计数；这里验证该行存在且带企业富化。
+	scopes, err := assets.ListTaskScopeWithSources(task.ID)
+	if err != nil || len(scopes) != 1 || scopes[0].Kind != "company" {
+		t.Fatalf("company scope row missing from task context: scopes=%+v err=%v", scopes, err)
 	}
-	companyScope, ok := scopeRows[0]["company_scope"].([]map[string]any)
-	if !ok || len(companyScope) != len(inputs) {
-		t.Fatalf("company scope not expanded: %#v", scopeRows[0])
+	if scopes[0].CompanyName != companiesName(t, companies, companyID) {
+		t.Fatalf("company scope row not enriched with company name: %+v", scopes[0])
 	}
-	kinds := make(map[string]string, len(companyScope))
-	for _, rule := range companyScope {
-		kinds[fmt.Sprint(rule["kind"])] = fmt.Sprint(rule["value"])
-	}
-	for _, input := range inputs {
-		if kinds[input.Kind] != input.Value {
-			t.Errorf("scope %s=%q want %q", input.Kind, kinds[input.Kind], input.Value)
-		}
-	}
-	keywords, ok := scopeRows[0]["company_keywords"].([]string)
-	if !ok || len(keywords) != 1 || keywords[0] != keyword {
-		t.Fatalf("company keywords missing: %#v", scopeRows[0]["company_keywords"])
+	if denom, _ := coverage["denominator"].(int); denom < 1 {
+		t.Fatalf("company asset not counted in overview coverage: %#v", coverage["denominator"])
 	}
 	if hc, _ := coverage["host_count"].(int); hc < 1 {
 		t.Fatalf("company asset host not counted in agent context: %#v", coverage["host_count"])
