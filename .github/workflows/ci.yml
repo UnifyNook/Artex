@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    # 只匹配分支：tag 推送交给 release 工作流（其内部先复用本工作流），避免重复跑
+    branches: ["**"]
+  workflow_call: # 供 release.yml 复用：打包前必须先过这里全部检查
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # 前端：npm ci + next 静态导出（next build 含 TypeScript 类型检查）。
+  # 代码风格由仓库的 husky + lint-staged（biome check --write）在提交时把关。
+  frontend:
+    name: 前端静态导出（含类型检查）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+        working-directory: web
+      - run: npm run build:static
+        working-directory: web
+
+  go:
+    name: Go vet / build / test（含 PostgreSQL 集成测试）
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: artex
+          POSTGRES_DB: artex
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d artex"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      # 集成测试读到该变量才启用，缺库时它们会静默 Skip——这里必须显式提供
+      ARTEX_PG_DSN: postgres://postgres:artex@127.0.0.1:5432/artex?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      # Norma 是私有仓库，go 拉取需跳过公共 proxy/sumdb（GOPRIVATE）并注入 GitHub App 安装令牌。
+      # 前置条件：UnifyNook 的 GitHub App 已安装到 Norma 仓库（Repository permissions 含
+      # Contents: Read-only）。vars.APP_CLIENT_ID / secrets.APP_PRIVATE_KEY 建议配在组织级，
+      # 供 release 等其他工作流复用；此处把令牌再收窄到只读 Norma，最小权限。
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: UnifyNook
+          repositories: Norma
+          permission-contents: read
+      - name: Authenticate private Go modules
+        env:
+          APP_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          git config --global url."https://x-access-token:${APP_TOKEN}@github.com/UnifyNook/".insteadOf "https://github.com/UnifyNook/"
+          echo "GOPRIVATE=github.com/UnifyNook/*" >> "$GITHUB_ENV"
+      - run: go vet ./...
+      - run: go build ./...
+      # embedui 生产构建标签要求 server/webui/dist 非空（go:embed all:webui/dist，
+      # 空目录无法编译）；CI 用占位文件验证带该标签的代码可编译，真实前端产物
+      # 由 frontend job 与 release 的打包链路验证。
+      - name: go build（embedui 生产构建标签）
+        run: |
+          mkdir -p server/webui/dist
+          printf '<!doctype html><title>embedui placeholder</title>' > server/webui/dist/index.html
+          go build -tags embedui ./...
+      # -count=1 禁用测试缓存，避免历史通过结果掩盖真实现状；
+      # -p 1 串行各包：多包并行时跨包的清理 DELETE 在共享库上会互相死锁。
+      - run: go test -count=1 -p 1 ./...

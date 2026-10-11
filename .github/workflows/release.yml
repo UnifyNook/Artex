@@ -8,8 +8,15 @@ permissions:
   packages: write # 推送 GHCR 镜像需要
 
 jobs:
+  # ⓪ 先过 CI（复用 ci.yml：go vet / build / PostgreSQL 集成测试 / 前端静态导出），
+  #    全绿后才开始构建发布产物
+  ci:
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+
   # ① 前端静态导出（一次），产物给交叉编译各平台复用
   frontend:
+    needs: ci
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

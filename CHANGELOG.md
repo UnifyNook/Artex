@@ -4,6 +4,21 @@
 
 ## [Unreleased]
 
+### CI
+
+#### 新增的功能
+
+- **新增 push 触发的 CI 工作流（`.github/workflows/ci.yml`）**：每次 push 自动跑 `go vet`、`go build`（含 embedui 生产构建标签）、全量 `go test` 与前端静态导出（含 TypeScript 类型检查）。`go test` 接入 PostgreSQL 16 服务容器（DSN 走 `ARTEX_PG_DSN`），集成测试不再因缺库静默跳过，并以 `-p 1` 串行各包、`-count=1` 禁用测试缓存。拉取私有依赖 Norma 复用 GitHub App 令牌机制。
+- **发行改为「先过 CI 再打包」**：推 tag 触发的 release 工作流把 ci.yml 作为首个 job（`workflow_call` + `secrets: inherit`），全绿后才开始前端导出、五平台交叉编译、创建 Release 与推送 GHCR 镜像；检查逻辑单点维护，发布链路零重复定义。日常 push 只跑 CI，不产生任何发布产物。
+
+### 测试基础设施
+
+#### 修复的问题
+
+- **修复集成测试在全新数据库上的存量失败**（此前测试只对长期使用的开发库跑过，全新库从未被全量验证）：
+  - `llmrec`：`llm_usage` 表由 server 启动时补建而非 schema.sql，全量并行跑时依赖其他包的测试恰好先建过才能通过；现用例内自行 `EnsureLLMUsageTable`，与启动逻辑等价。
+  - `agent`：`TestGraphOverviewExpandsAssociatedCompanyScope` 仍断言 06a43f3 已删除的 `coverage.scope` 平铺结构（含 company 富化），本机可达 PostgreSQL 时稳定失败；现改断言当前契约——task_scope 的 `kind=company` 行带企业富化、overview 的 coverage 计数与 host_count 反映公司资产。
+
 ## [0.3.15] - 2026-10-07
 
 ### 拦截
