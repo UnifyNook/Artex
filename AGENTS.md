@@ -1,12 +1,6 @@
-# AGENTS.md
-
-本文件是仓库级统一入口。子目录中更近的 `AGENTS.md` 会补充或覆盖这里的规则；用户在对话中的明确要求优先级最高。本体系的编写与维护约定见 `docs/AGENTS.md完全使用指南.md`（本地参考，`docs/` 不入库）。
-
 ## 项目概览
 
 ARTEX 是 AI 自主渗透测试系统：Go 单体后端（`net/http` + PostgreSQL）内嵌 Next.js 静态前端，多 agent 探索能力由 [Norma](https://github.com/UnifyNook/Norma) SDK（agentcore / tool / permission / harness / memory / transcript）提供。核心是**双图架构**：全局共享的资产图（companies / assets / scope，跨任务真值库）与每任务独立的探索图（goal / intent / fact / finding / hint 血缘链）经 anchors 相连；planner 事件驱动派意图、worker 领意图执行并写回，形成探索闭环。
-
-本项目仅供学习与本地技术验证，严禁对线上系统发起实际测试（见 README 免责声明）。
 
 ## 常用命令
 
@@ -17,25 +11,9 @@ ARTEX 是 AI 自主渗透测试系统：Go 单体后端（`net/http` + PostgreSQ
 
 ## 全局要点
 
-- **前端包管理器是 npm**（package-lock.json）；Go 模块路径为 `github.com/UnifyNook/Artex`。
-- **Norma 依赖**：go.mod 固定 `github.com/UnifyNook/Norma`；本地联调时 `go.work`（gitignore，不提交）指向兄弟目录 `../norma`。
 - **前端改动要进入单二进制**，必须重新静态导出并同步 `server/webui/dist/`，再带 `-tags embedui` 编译；不带该 tag 时 webui 路由返回 404 提示页。
 - **数据库迁移是「重启即迁移」**：`db/schema.sql` 随 go:embed 每次启动幂等重跑，改表结构必须保持幂等（细则见 db/AGENTS.md）。
-- **提交规范**：Conventional Commits（`feat:` / `fix:` / `docs:` …），描述用中文；变更同步记录到 CHANGELOG.md（Keep a Changelog）。
 - `docs/`（跨模块设计文档）与 `参考项目/`（上游源码比对用）均在 .gitignore 中，不入库；`参考项目/` 除非用户明确要求，不要修改，复制代码前必须适配本项目 API 与配置。
-
-## 特殊工具提示
-
-本项目在 `.cursor/mcp.json` 与 `.opencode/opencode.json` 中配置了 Serena 与 CodeGraph 两个 MCP，与原生工具按任务形状分工，不要无条件只用某一个：
-
-- 跨文件架构、功能入口、调用链、依赖关系、改动影响面，且当前项目已初始化
-  CodeGraph 时，优先使用 CodeGraph 获取全局上下文。
-- 已知具体符号后的定义查看、引用查找、精确修改、重命名，使用 Serena/LSP。
-- 精确文本搜索（错误信息、日志字符串、配置键）、整文件阅读、行级编辑、
-  命令执行，使用原生工具。
-- 索引结果（CodeGraph 图数据、调用计数）与实际源码不一致时，以当前源码和
-  可执行验证结果为准；逐点精确的引用清单以 Serena（LSP references）为准。
-- Serena 返回的行号是 0-based，向用户报告时 +1。
 
 ## ⚠ 必读：分层规则
 
@@ -67,32 +45,3 @@ ARTEX 是 AI 自主渗透测试系统：Go 单体后端（`net/http` + PostgreSQ
 | `sidequestion` | `/btw` 旁路提问：上下文快照 + 单次回答，不建 agent 会话 |
 | `report` | 报告导出：任务级 Markdown、单漏洞 zip、CSV |
 | `selfupdate` | 一键更新：下载校验、暂存换装、连崩自动回滚（三次启动协议） |
-
-## 行为反模式警示：拒绝纠错残留
-
-严厉禁止以下“纠偏后残留历史痕迹与自我辩解”的行为模式：
-
-> 用户让做一盘“番茄炒蛋”，Agent 擅自加了“东坡肉”；被指出后虽然去掉了，但提交/PR 时写着「番茄炒蛋（无东坡肉）」，并在注释中大篇幅解释为什么本道菜不需要加东坡肉。
-
-**交付要求**：任何代码、注释、文档、提交信息及回复，都必须直接呈现对齐后的**干净终态设计**（Clean final-state design），严禁包含任何前序错误、自我辩解或“在此删掉某逻辑”的纠错痕迹。
-
-## AI协助开发声明
-
-凡使用了 AI 辅助生成或修改的代码，必须在 **commit 信息结尾**（以及对应 **PR 描述**中）按以下格式注明所使用的工具环境和模型：
-
-```
-assisted-by：{agent_name}：{model}
-```
-
-- `{agent_name}`：使用的 AI 编码工具/环境，如 `opencode`、`codex`、`cursor`
-- `{model}`：实际使用的模型（含供应商，格式可参考 `供应商/模型`），如 `Zhipu/GLM-5.3[Max]`
-
-示例：
-
-```bash
-git commit -m "feat(channel): support batch model pulling
-
-assisted-by：opencode：Zhipu/GLM-5.3[Max]"
-```
-
-多个模型/工具参与时逐行列出。纯人工改动无需此声明，但需在 PR 描述中说明。
